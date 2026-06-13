@@ -41,7 +41,7 @@ module.exports.index = async (req, res) => {
 
     console.log("Listings count:", allListings.length);
 
-    res.send(`Found ${allListings.length} listings`);
+    res.render("listings/index", { allListings });
 };
 
 module.exports.renderNewForm = (req, res) => {
