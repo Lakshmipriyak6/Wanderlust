@@ -153,11 +153,6 @@ const validateReview=(req,res,next) => {
 //     res.send(registeredUser);
 // });
 
-// ROUTERS
-app.use("/listings", listingRouter);
-app.use("/listings/:id/reviews", reviewRouter);
-app.use("/", userRouter);
-
 // Dev-only demo seeding route (creates demo user and demo ghost listing)
 if (process.env.NODE_ENV !== 'production') {
     app.get('/seed-demo', async (req, res) => {
@@ -233,65 +228,6 @@ app.get('/__seed_demo', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
-//Index Route
-app.get("/listings",wrapAsync(async (req, res) => {
-    const allListings = await Listing.find({});
-    console.log("Listings count:", allListings.length);
-    res.render("listings/index", { allListings });
-}));
-
-//New Route
-app.get("/listings/new",(req,res)=>{
-    res.render("listings/new.ejs");
-});
-
-//Show Route
-app.get("/listings/:id", wrapAsync(async(req,res)=>{
-    let {id} = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
-    if(!listing){
-        throw new ExpressError(404,"Listing not found");
-    }
-    res.render("listings/show.ejs",{listing});
-}));
-
-//Create Route
-app.post(
-    "/listings",
-    validateListing,
-    wrapAsync(async(req,res)=>{
-        const newListing = new Listing(req.body.listing);
-        await newListing.save();
-        res.redirect("/listings");
-    })
-);
-
-//Edit Route
-app.get("/listings/:id/edit", wrapAsync(async (req,res)=>{
-    let {id} = req.params;
-    const listing = await Listing.findById(id);
-    if(!listing){
-        throw new ExpressError(404,"Listing not found");
-    }
-    res.render("listings/edit.ejs",{listing});
-}));
-
-//Update Route
-app.put("/listings/:id",
-    validateListing,
-    wrapAsync(async(req,res)=>{
-        let{id}=req.params;
-        await Listing.findByIdAndUpdate(id,{...req.body.listing});
-        res.redirect(`/listings/${id}`);
-}));
-
-//Delete Route
-app.delete("/listings/:id",wrapAsync(async (req, res) => {
-    let { id } = req.params;
-    await Listing.findByIdAndDelete(id);
-    res.redirect("/listings");
-}));
 
 // 404 Route
 app.use((req, res, next) => {
