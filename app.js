@@ -25,6 +25,7 @@ const User=require("./models/user.js");
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+const userController = require("./controllers/users.js");
 const Listing = require("./models/listing.js");
 
 const { listingSchema, reviewSchema } = require("./schema.js");
@@ -52,6 +53,13 @@ async function main(){
         }
     }
 }
+
+app.set("view engine","ejs");
+app.set("views",path.join(__dirname,"views"));
+app.engine("ejs", ejsMate);
+app.use(express.urlencoded({extended: true}));
+app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname,"public")));
 
 main()
 .then(() => {
@@ -92,6 +100,19 @@ main()
     });
 
     // Mount routers that depend on sessions/passport
+    app.get("/signup", userController.renderSignupForm);
+    app.post("/signup", wrapAsync(userController.signup));
+    app.get("/login", userController.renderLoginForm);
+    app.post(
+        "/login",
+        passport.authenticate("local", {
+            failureRedirect: "/login",
+            failureFlash: true,
+        }),
+        userController.login
+    );
+    app.get("/logout", userController.logout);
+
     app.use("/listings", listingRouter);
     app.use("/listings/:id/reviews", reviewRouter);
     app.use("/", userRouter);
@@ -105,13 +126,6 @@ main()
     console.error("Failed to connect to any database:", err);
     process.exit(1);
 });
-
-app.set("view engine","ejs");
-app.set("views",path.join(__dirname,"views"));
-app.use(express.urlencoded({extended: true}));
-app.use(methodOverride("_method"));
-app.engine("ejs", ejsMate);
-app.use(express.static(path.join(__dirname,"public")));
 
 // Session and passport setup will be initialized after DB connection to ensure
 // the session store can be created using the resolved DB URL (and fallbacks).
