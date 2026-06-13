@@ -153,7 +153,7 @@ main()
     console.log("Registered routes:", routes);
 
     console.log("Database ready — starting server");
-    app.listen(PORT, () => {
+    app.listen(PORT, () => {    
         console.log(`server is listening on port ${PORT}`);
     });
 })
