@@ -61,6 +61,16 @@ app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname,"public")));
 
+app.get('/__health', (req, res) => {
+    res.send('OK');
+});
+
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
+
+const PORT = process.env.PORT || 3000;
+
 main()
 .then(() => {
     // Now that DB is connected, initialize session store and passport
@@ -137,8 +147,8 @@ main()
     console.log("Registered routes:", routes);
 
     console.log("Database ready — starting server");
-    app.listen(3000, () => {
-        console.log("server is listening to port 3000");
+    app.listen(PORT, () => {
+        console.log(`server is listening on port ${PORT}`);
     });
 })
 .catch((err) => {
@@ -150,10 +160,6 @@ main()
 // the session store can be created using the resolved DB URL (and fallbacks).
 
 
-
-app.get("/", (req, res) => {
-    res.redirect("/listings");
-});
 
 // // Validation Middleware
 const validateListing = (req, res, next) => {
