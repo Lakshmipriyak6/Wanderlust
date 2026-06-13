@@ -259,13 +259,14 @@ This project helped strengthen my understanding of:
 
 ## Author
 
-Kalvakota Lakshmipriya
-Email-lakshmipriyak931@gmail.com
-Linkedin Profile-https://www.linkedin.com/in/kalvakota-lakshmipriya-30783a305/
+**Kalvakota Lakshmipriya**
+
+- Email: lakshmipriyak931@gmail.com
+- LinkedIn: https://www.linkedin.com/in/kalvakota-lakshmipriya-30783a305/
 
 ## Live Demo
 
-Public URL:https://wanderlust-1qs6.onrender.com
+- Public URL: https://wanderlust-1qs6.onrender.com
 
 ---
 
