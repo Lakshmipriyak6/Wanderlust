@@ -1,23 +1,31 @@
-<%if(success && success.length){ %>
-<div class="alert alert-success alert-dismissible fade show col-6 offset-3" role="alert">
-    <%= success %>
-    <button 
-    type="button" 
-    class="btn-close" 
-    data-bs-dismiss="alert" 
-    aria-label="Close">
-</button>
-</div>
+<%
+    const flashSuccess = Array.isArray(success) ? success : (typeof success !== 'undefined' ? [success] : []);
+    const flashError = Array.isArray(error) ? error : (typeof error !== 'undefined' ? [error] : []);
+%>
+<% if (flashSuccess.length) { %>
+    <% flashSuccess.forEach(msg => { %>
+        <div class="alert alert-success alert-dismissible fade show col-6 offset-3" role="alert">
+            <%= msg %>
+            <button 
+                type="button" 
+                class="btn-close" 
+                data-bs-dismiss="alert" 
+                aria-label="Close">
+            </button>
+        </div>
+    <% }) %>
 <% } %>
 
-<%if(error && error.length){ %>
-<div class="alert alert-danger alert-dismissible fade show col-6 offset-3" role="alert">
-    <%= error %>
-    <button 
-    type="button" 
-    class="btn-close" 
-    data-bs-dismiss="alert" 
-    aria-label="Close">
-</button>
-</div>
+<% if (flashError.length) { %>
+    <% flashError.forEach(msg => { %>
+        <div class="alert alert-danger alert-dismissible fade show col-6 offset-3" role="alert">
+            <%= msg %>
+            <button 
+                type="button" 
+                class="btn-close" 
+                data-bs-dismiss="alert" 
+                aria-label="Close">
+            </button>
+        </div>
+    <% }) %>
 <% } %>
