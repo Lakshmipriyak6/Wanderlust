@@ -35,9 +35,13 @@ const geocodeListing = async (listing) => {
 };
 
 module.exports.index = async (req, res) => {
+    console.log("INDEX CONTROLLER HIT");
+
     const allListings = await Listing.find({});
+
     console.log("Listings count:", allListings.length);
-    res.render("listings/index", { allListings });
+
+    res.send(`Found ${allListings.length} listings`);
 };
 
 module.exports.renderNewForm = (req, res) => {
