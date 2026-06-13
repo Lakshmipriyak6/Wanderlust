@@ -1,0 +1,23 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="row mt-4">
+  <div class="col-6 offset-3 card p-4">
+    <h3>@<%= user.username %> — Carbon Passport</h3>
+    <p><strong>Lifetime carbon score:</strong> <%= (user.carbonScore || 0).toFixed(2) %> kg CO2</p>
+    <p><strong>Trees planted:</strong> <%= user.treesPlanted || 0 %></p>
+
+    <form action="/profile/offset" method="POST" class="row g-2">
+      <div class="col-6">
+        <label>Plant trees to offset</label>
+        <input type="number" name="trees" class="form-control" min="1" value="1" />
+      </div>
+      <div class="col-6 d-flex align-items-end">
+        <button class="btn btn-success">Plant & Offset</button>
+      </div>
+    </form>
+
+    <hr />
+    <h5>Leaderboard (Top eco travelers)</h5>
+    <p>Visit the leaderboard to view top travelers (coming soon)</p>
+  </div>
+</div>

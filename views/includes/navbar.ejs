@@ -1,0 +1,53 @@
+<nav class="navbar navbar-expand navbar-light bg-light border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="fa-regular fa-compass"></i></a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/listings">All Listings</a>
+        <a class="nav-link" href="/listings/new">Add New Listing</a>
+      </div>
+
+      <div class="nav-search" role="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" placeholder="Search destinations" aria-label="Search destinations">
+      </div>
+
+      <div class="theme-switch ms-auto" aria-label="Theme options">
+        <button class="theme-option" type="button" data-theme-value="light" aria-label="Use light theme">
+          <i class="fa-regular fa-sun"></i>
+        </button>
+        <button class="theme-option" type="button" data-theme-value="dark" aria-label="Use dark theme">
+          <i class="fa-regular fa-moon"></i>
+        </button>
+      </div>
+
+      <% if(typeof currentUser === "undefined" || !currentUser){ %>
+       <div class="navbar-nav auth-nav">
+        <a class="nav-link" href="/signup">Sign Up</a>
+        <a class="nav-link" href="/login">Log In</a>
+      </div>
+      <% } else { %>
+      <div class="navbar-nav auth-nav">
+        <a class="nav-link" href="/profile">Profile</a>
+        <a class="nav-link" href="/logout">Log Out</a>
+        <span class="nav-link">CO2: <strong><%= (currentUser.carbonScore || 0).toFixed ? (currentUser.carbonScore || 0).toFixed(0) : (currentUser.carbonScore || 0) %> kg</strong></span>
+      </div>
+      <% } %>
+
+    </div>
+  </div>
+</nav>

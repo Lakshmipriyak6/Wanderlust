@@ -1,0 +1,198 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="row mt-3">
+  <div class="col-8 offset-3">
+    <h3><%= listing.title %></h3>
+  </div>
+
+  <div class="card col-6 offset-3 show-card listing-card">
+    <% const ghostExpiryISO = listing.ghostExpires ? listing.ghostExpires.toISOString() : null; %>
+    <div style="position:relative;">
+      <img src="<%= listing.image.url %>" 
+      class="card-img-top show-img <%= (isGhostActive && !revealed) ? 'blurred' : '' %>" 
+      alt="listing_image" >
+      <% if (isGhostActive && !revealed) { %>
+        <div class="ghost-overlay">
+          <div class="ghost-badge">GHOST DROP</div>
+          <div id="ghost-countdown" class="ghost-countdown">24:00:00</div>
+        </div>
+      <% } %>
+    </div>
+    <br>
+    <div class="card-body">Owned by:
+    <i><b><%= listing.owner.username %></i></b></p>
+  <p class="card-text"><%= listing.description %><br></p>
+  <p class="card-text">Price: &#8377;<%= (isGhostActive && listing.ghostPrice) ? listing.ghostPrice.toLocaleString("en-IN") : listing.price.toLocaleString("en-IN")%></p>
+  <p class="card-text">Location: <span id="listing-location"><%= (isGhostActive && !revealed) ? 'Reveal after booking' : listing.location %></span></p>
+  <p class="card-text"> <%= listing.country %></p>
+    </div>
+  </div>
+
+  <div class="col-6 offset-3 mt-3 map-section">
+    <h4>Location</h4>
+    <div id="map" style="height: 400px;"></div>
+</div>
+
+  <br />
+
+  <br><br>
+
+  <div class="btns col-6 offset-3">
+    <a href="/listings/<%= listing._id %>/edit" 
+      class="btn btn-dark listing-action-btn">Edit</a>
+
+    <form method="POST" 
+    action="/listings/<%= listing._id %>?_method=DELETE" class="delete-form">
+      <button class="btn btn-dark listing-action-btn">Delete</button>
+    </form>
+  </div>
+
+  <% if (isGhostActive && !revealed) { %>
+    <div class="col-6 offset-3 mt-3">
+      <form action="/listings/<%= listing._id %>/book" method="POST" class="row g-2">
+        <div class="col-4">
+          <label>Distance (km)</label>
+          <input name="distanceKm" class="form-control" type="number" step="0.1" required />
+        </div>
+        <div class="col-4">
+          <label>Mode</label>
+          <select name="travelMode" class="form-select">
+            <option value="flight">Flight</option>
+            <option value="car">Car</option>
+            <option value="train">Train</option>
+          </select>
+        </div>
+        <div class="col-2">
+          <label>Nights</label>
+          <input name="stayDays" class="form-control" type="number" min="1" value="1" />
+        </div>
+        <div class="col-2 d-flex align-items-end">
+          <button class="btn btn-success">Book & Reveal</button>
+        </div>
+      </form>
+    </div>
+  <% } %>
+
+  <div class="col-8 offset-3 mb-3">
+    <hr/>
+    <h4>Leave a Review</h4>
+    <form action="/listings/<%= listing._id %>/reviews" method="POST" 
+      novalidate 
+      class="needs-validation">
+      <fieldset class="starability-slot">
+  <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." />
+  <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+  <label for="first-rate1" title="Terrible">1 star</label>
+  <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+  <label for="first-rate2" title="Not good">2 stars</label>
+  <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+  <label for="first-rate3" title="Average">3 stars</label>
+  <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+  <label for="first-rate4" title="Very good">4 stars</label>
+  <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+  <label for="first-rate5" title="Amazing">5 stars</label>
+</fieldset>
+      
+    <div class="mb-3 mt-3">
+        <label for="comment" class="form-label">Comments</label>
+        <textarea 
+          name="review[comment]" 
+          id="comment" 
+          cols="30"
+          rows="5"
+          class="form-control" required></textarea>
+        <div class="invalid-feedback">Please enter your comments.</div>
+      </div>
+
+      <button class="btn btn-outline-dark">Submit</button>
+    </form>
+    <hr/>
+    <p><b>All Reviews</b></p>
+    <div class="row">
+       <% for(let review of listing.reviews){ %>
+      <div class="card col-5 ms-3 mb-3">
+          <div class="card-body">
+<h5 class="card-title">@<%= review.author && review.author.username %></h5>
+ <p class="starability-result card-text" data-rating="<%= review.rating %>">
+                  Rated: <%= review.rating %> stars
+                 </p>
+                 <p class="card-text"><%= review.comment %></p>
+                 <br>
+          </div>
+          <form class="mb-3" method="POST" action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE">
+            <button class="btn btn-sm btn-dark">Delete</button>
+          </form>
+      </div>
+    <% } %>
+    </div>
+  </div>
+</div>
+
+<br><br>
+
+<script src="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.umd.min.js"></script>
+
+<script>
+const coordinates = <%- JSON.stringify(listing.geometry && listing.geometry.coordinates ? listing.geometry.coordinates : []) %>;
+const mapToken = <%- JSON.stringify(mapToken || "") %>;
+const listingLocation = <%- JSON.stringify(listing.location || "") %>;
+const listingCountry = <%- JSON.stringify(listing.country || "") %>;
+const hasValidCoordinates = Array.isArray(coordinates)
+    && coordinates.length === 2
+    && coordinates.every((coordinate) => typeof coordinate === "number")
+    && !(coordinates[0] === 0 && coordinates[1] === 0);
+const isGhostActive = <%- JSON.stringify(!!(typeof isGhostActive !== 'undefined' && isGhostActive)) %>;
+const revealed = <%- JSON.stringify(!!(typeof revealed !== 'undefined' && revealed)) %>;
+
+if (isGhostActive && !revealed) {
+  document.getElementById("map").innerHTML = "<p class='text-muted p-3'>Location is hidden until you book this Ghost Drop.</p>";
+  // Start countdown
+  const ghostExpiry = <%- JSON.stringify(ghostExpiryISO) %> ? new Date(<%- JSON.stringify(ghostExpiryISO) %>) : null;
+  if (ghostExpiry) {
+    const countdownEl = document.getElementById('ghost-countdown');
+    const update = () => {
+      const now = new Date();
+      const diff = ghostExpiry - now;
+      if (diff <= 0) {
+        countdownEl.innerText = 'Expired';
+        clearInterval(timer);
+        return;
+      }
+      const hrs = Math.floor(diff / (1000*60*60));
+      const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+      const secs = Math.floor((diff % (1000*60)) / 1000);
+      countdownEl.innerText = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    };
+    update();
+    const timer = setInterval(update, 1000);
+  }
+} else {
+  if (!mapToken || !hasValidCoordinates) {
+    document.getElementById("map").innerHTML = "<p class='text-muted p-3'>Location map is unavailable for this listing.</p>";
+  } else {
+    maptilersdk.config.apiKey = mapToken;
+    const mapStyles = {
+      light: `https://api.maptiler.com/maps/streets-v4/style.json?key=${mapToken}`,
+      dark: `https://api.maptiler.com/maps/streets-v4-dark/style.json?key=${mapToken}`
+    };
+    const getTheme = () => document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+
+    const map = new maptilersdk.Map({
+      container: "map",
+      style: mapStyles[getTheme()],
+      center: coordinates,
+      zoom: 10
+    });
+
+    new maptilersdk.Marker()
+      .setLngLat(coordinates)
+      .setPopup(new maptilersdk.Popup({ offset: 25 }).setText(`${listingLocation}, ${listingCountry}`))
+      .addTo(map);
+
+    window.addEventListener("wanderlust:themechange", (event) => {
+      const theme = event.detail?.theme === "dark" ? "dark" : "light";
+      map.setStyle(mapStyles[theme]);
+    });
+  }
+}
+</script>
