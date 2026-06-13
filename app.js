@@ -61,6 +61,11 @@ app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname,"public")));
 
+app.use((req, res, next) => {
+    console.log('INCOMING', req.method, req.originalUrl);
+    next();
+});
+
 app.get('/__health', (req, res) => {
     res.send('OK');
 });
