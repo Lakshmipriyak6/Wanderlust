@@ -80,11 +80,10 @@ main()
 .then(() => {
     // Now that DB is connected, initialize session store and passport
     const sessionSecret = process.env.SECRET || 'thisshouldbeabettersecret';
-    const store = MongoStore.create({
-        mongoUrl: activeDbUrl,
-        crypto: { secret: sessionSecret },
-        touchAfter: 24 * 3600
-    });
+ const store = MongoStore.create({
+    mongoUrl: activeDbUrl,
+    touchAfter: 24 * 3600,
+});
     store.on('error', function(e){
         console.log('SESSION STORE ERROR', e);
     });
