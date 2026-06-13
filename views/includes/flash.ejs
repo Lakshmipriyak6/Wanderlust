@@ -1,6 +1,16 @@
 <%
-    const flashSuccess = Array.isArray(success) ? success : (typeof success !== 'undefined' ? [success] : []);
-    const flashError = Array.isArray(error) ? error : (typeof error !== 'undefined' ? [error] : []);
+    let flashSuccess = [];
+    let flashError = [];
+    if (typeof success !== 'undefined') {
+        flashSuccess = Array.isArray(success) ? success : [success];
+    } else if (typeof locals !== 'undefined' && typeof locals.success !== 'undefined') {
+        flashSuccess = Array.isArray(locals.success) ? locals.success : [locals.success];
+    }
+    if (typeof error !== 'undefined') {
+        flashError = Array.isArray(error) ? error : [error];
+    } else if (typeof locals !== 'undefined' && typeof locals.error !== 'undefined') {
+        flashError = Array.isArray(locals.error) ? locals.error : [locals.error];
+    }
 %>
 <% if (flashSuccess.length) { %>
     <% flashSuccess.forEach(msg => { %>
