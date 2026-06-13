@@ -152,6 +152,23 @@ main()
         });
     console.log("Registered routes:", routes);
 
+    // 404 Route - must be AFTER all other routes
+    app.use((req, res, next) => {
+      next(new ExpressError(404, "Page Not Found!"));
+    });
+
+    // Error Handler - must be last
+    app.use((err, req, res, next) => {
+       console.error("Error caught:", err);
+       // Check if headers have already been sent
+       if (res.headersSent) {
+           console.log("Headers already sent, cannot send error response");
+           return;
+       }
+       let { statusCode = 500, message = "Something went wrong!" } = err;
+       res.status(statusCode).render("error.ejs", { message });
+    });
+
     console.log("Database ready — starting server");
     app.listen(PORT, () => {    
         console.log(`server is listening on port ${PORT}`);
@@ -272,17 +289,6 @@ app.get('/__seed_demo', async (req, res) => {
         console.error('Seed demo error:', err);
         res.status(500).json({ error: err.message });
     }
-});
-
-// 404 Route
-app.use((req, res, next) => {
-  next(new ExpressError(404, "Page Not Found!"));
-});
-
-// Error Handler
-app.use((err,req,res,next)=>{
-   let{statusCode=500,message="Something went wrong!"}=err;
-   res.status(statusCode).render("error.ejs",{message});
 });
 
 // Server is started after DB connection in the `main()` completion handler above.
