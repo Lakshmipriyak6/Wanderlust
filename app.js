@@ -99,10 +99,13 @@ main()
         next();
     });
 
-    // Mount routers that depend on sessions/passport
+    // Mount auth routes that depend on sessions/passport
     app.get("/signup", userController.renderSignupForm);
+    console.log("Registered GET /signup");
     app.post("/signup", wrapAsync(userController.signup));
+    console.log("Registered POST /signup");
     app.get("/login", userController.renderLoginForm);
+    console.log("Registered GET /login");
     app.post(
         "/login",
         passport.authenticate("local", {
@@ -111,11 +114,16 @@ main()
         }),
         userController.login
     );
+    console.log("Registered POST /login");
     app.get("/logout", userController.logout);
+    console.log("Registered GET /logout");
 
-    app.use("/listings", listingRouter);
-    app.use("/listings/:id/reviews", reviewRouter);
     app.use("/", userRouter);
+    console.log("Mounted userRouter");
+    app.use("/listings", listingRouter);
+    console.log("Mounted listingRouter");
+    app.use("/listings/:id/reviews", reviewRouter);
+    console.log("Mounted reviewRouter");
 
     console.log("Database ready — starting server");
     app.listen(3000, () => {
