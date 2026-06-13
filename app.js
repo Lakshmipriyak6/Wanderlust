@@ -135,7 +135,8 @@ main()
     app.use("/listings/:id/reviews", reviewRouter);
     console.log("Mounted reviewRouter");
 
-    const routes = app._router.stack
+    const routerStack = (app.router && app.router.stack) ? app.router.stack : [];
+    const routes = routerStack
         .filter((layer) => layer.route)
         .map((layer) => {
             const methods = Object.keys(layer.route.methods)
